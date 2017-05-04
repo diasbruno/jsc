@@ -76,7 +76,7 @@
   (cond
     ((char-equal char #\newline) (progn
                                    (read-char stream nil nil)
-                                   (js-token-next stream)))
+                                   (token-next stream)))
     ((string-quote-p char) (read-string-until stream char))
     ((group-char-p char) `(:grp ,(string (read-char stream nil nil))))
     ((punctuation-char-p char) (read-punct stream))
@@ -84,20 +84,20 @@
                                    (read-spaces stream)
                                    (progn
                                      (read-spaces stream)
-                                     (js-token-next stream))))
+                                     (token-next stream))))
     ((identifier-char-p char) (read-identifier stream))
     ((numeric-char-p char) (read-number stream))
     (t nil)))
 
-(defun js-token-expect-char (stream char)
+(defun token-expect-char (stream char)
   (let ((c (peek-char nil stream nil)))
     (if (char-equal c #\SPACE)
         (progn
           (read-spaces stream)
-          (js-token-expect-char stream char))
+          (token-expect-char stream char))
         (and c (char-equal c char)))))
 
-(defun js-token-next (stream &optional (keep-space nil))
+(defun token-next (stream &optional (keep-space nil))
   "Parse from a STREAM."
   ;;(declare (optimize (speed 3)))
   (let ((c (peek-char nil stream nil)))
@@ -105,9 +105,9 @@
         (read-statement-by-char stream c keep-space)
         nil)))
 
-(defun js-stop-when-char (token char)
+(defun stop-when-char (token char)
   (and token (not (string= char (cadr token)))))
 
-(defun js-token-skip (stream char)
-  (when (js-token-expect-char stream char)
-    (js-token-next stream)))
+(defun token-skip (stream char)
+  (when (token-expect-char stream char)
+    (token-next stream)))

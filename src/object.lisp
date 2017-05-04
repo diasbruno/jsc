@@ -1,19 +1,19 @@
 (in-package :jsc)
 
-(defun js-ast-process-key-value (stream)
+(defun ast-process-key-value (stream)
   "Get the pair of key/value from STREAM."
-  (assert (string= ":" (cadr (js-token-next stream))))
-  (js-ast-acquire stream (js-token-next stream)))
+  (assert (string= ":" (cadr (token-next stream))))
+  (ast-acquire stream (token-next stream)))
 
-(defun js-ast-build-obj (stream)
+(defun ast-build-obj (stream)
   "Real build the object with STREAM."
   (loop
-     :for stmt := (js-token-next stream)
-     :while (js-stop-when-char stmt "}")
-     :collect (when (js-ast-object-key-p stmt)
-                (js-token-skip stream #\,)
-                (list stmt (js-ast-process-key-value stream)))))
+     :for stmt := (token-next stream)
+     :while (stop-when-char stmt "}")
+     :collect (when (ast-object-key-p stmt)
+                (token-skip stream #\,)
+                (list stmt (ast-process-key-value stream)))))
 
-(defun js-ast-build-object (stream)
+(defun ast-build-object (stream)
   "Build the object ast with STREAM."
-  `(:obj ,(remove-if #'null (js-ast-build-obj stream))))
+  `(:obj ,(remove-if #'null (ast-build-obj stream))))
