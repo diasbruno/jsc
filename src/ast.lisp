@@ -9,7 +9,7 @@
   "Build the javascript ast from a STRING."
   (ast-from-stream (string-to-stream string)))
 
-(defun ast-acquire (stream token)
+(defun ast-for (stream token)
   (cond
     ((ast-function-p token) (ast-build-function stream))
     ((ast-var-p token) (ast-build-var stream token))
@@ -25,4 +25,4 @@
   (loop
      :for token := (token-next stream)
      :while (stop-when-char token ";")
-     :collect (ast-acquire stream token)))
+     :collect (ast-for stream token)))

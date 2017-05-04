@@ -3,7 +3,7 @@
 (defun ast-process-key-value (stream)
   "Get the pair of key/value from STREAM."
   (assert (string= ":" (cadr (token-next stream))))
-  (ast-acquire stream (token-next stream)))
+  (ast-for stream (token-next stream)))
 
 (defun ast-build-obj (stream)
   "Real build the object with STREAM."

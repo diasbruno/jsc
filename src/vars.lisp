@@ -14,7 +14,7 @@
 (defun ast-assignment (stream)
   "Build the ast for the value of a variable from a STREAM."
   (token-next stream)
-  (ast-acquire stream (token-next stream)))
+  (ast-for stream (token-next stream)))
 
 (defun ast-build-var (stream var-type)
   "Build the var ast for a VAR-TYPE and read from STREAM."
