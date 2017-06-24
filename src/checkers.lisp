@@ -1,31 +1,28 @@
 (in-package :jsc)
 
-(defun ast-literals-p (token)
+(defun ast-literals-p (ty token)
   "Check if TOKEN is literal."
-  (or (eq :num (car token))
-      (eq :str (car token))))
+  (or (eq :num token)
+      (eq :str token)))
 
-(defun ast-var-p (token)
+(defun ast-var-p (ty token)
   "Check if the TOKEN is a var-like."
-  (let ((str (cadr token)))
-    (or (string= "var" str)
-        (string= "const" str)
-        (string= "let" str))))
+  (or (string= "var" token)
+      (string= "const" token)
+      (string= "let" token)))
 
-(defun ast-function-p (token)
+(defun ast-function-p (ty token)
   "Check if the TOKEN contains a 'function'."
-  (and (string= "function" (cadr token))
-       (eq (car token) :ident)))
+  (string= "function" token))
 
-(defun ast-obj-p (token)
+(defun ast-obj-p (ty token)
   "Check if the TOKEN is open curly bracket."
-  (string= "{" (cadr token)))
+  (string= "{" token))
 
-(defun ast-array-p (token)
+(defun ast-array-p (ty token)
   "Check if the TOKEN is open square bracket."
-  (string= "[" (cadr token)))
+  (string= "[" token))
 
-(defun ast-object-key-p (token)
+(defun ast-object-key-p (ty)
   "Check if the TOKEN has a valid key type."
-  (let ((ty (car token)))
-    (or (eq ty :str) (eq ty :ident))))
+  (or (eq ty :str) (eq ty :ident)))

@@ -2,17 +2,23 @@
 
 (defun ast-process-key-value (stream)
   "Get the pair of key/value from STREAM."
-  (assert (string= ":" (cadr (token-next stream))))
-  (ast-for stream (token-next stream)))
+  (multiple-value-bind (ty token)
+      (token-next stream)
+    (progn
+      (assert (string= ":" token))
+      (multiple-value-bind (ty-value token-value)
+          (token-next stream)
+        (ast-for stream ty-value token-value)))))
 
 (defun ast-build-obj (stream)
   "Real build the object with STREAM."
   (loop
-     :for stmt := (token-next stream)
-     :while (stop-when-char stmt "}")
-     :collect (when (ast-object-key-p stmt)
-                (token-skip stream #\,)
-                (list stmt (ast-process-key-value stream)))))
+     :for (ty stmt) := (multiple-value-list (token-next stream))
+     :while (and stmt (stop-when-char stmt "}"))
+     :collect (when (ast-object-key-p ty)
+                  (token-skip stream #\,)
+                  (list (list ty stmt)
+                        (ast-process-key-value stream)))))
 
 (defun ast-build-object (stream)
   "Build the object ast with STREAM."

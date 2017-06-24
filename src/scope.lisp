@@ -1,16 +1,18 @@
 (in-package :jsc)
 
-(defun close-body-p (token)
-  (not (and (eq (car token) :grp)
-            (string= "}" (cadr token)))))
+(defun close-body-p (ty token)
+  (and (eq ty :grp) (string= "}" token)))
 
 (defun ast-body (stream)
   "Build the body { N..exps; } with a STREAM."
-  (assert (string= "{" (cadr (token-next stream))))
-  (loop
-     :for expr := (ast-for stream (token-next stream))
-     :while (and expr (close-body-p expr))
-     :collect expr))
+  (multiple-value-bind (ty token)
+      (token-next stream)
+    (progn
+      (assert (string= "{" token))
+      (loop
+         :for (ty expr) := (multiple-value-list (token-next stream))
+         :while (and expr (not (close-body-p ty expr)))
+         :collect (ast-for stream ty expr)))))
 
 (defun ast-parentesis-expr (stream)
   "Build ast for expressions inside parentesis.
@@ -24,9 +26,12 @@ function '( exps ')' {body}
 fn.call '(' exps ')'
 new T '(' exps ')'
 "
-  (assert (string= "(" (cadr (token-next stream))))
-  (loop
-     :for arg := (ast-for stream (token-next stream))
-     :while (stop-when-char arg ")")
-     :nconc (prog1 (list arg)
-              (token-skip stream #\,))))
+  (multiple-value-bind (ty token)
+      (token-next stream)
+    (progn
+      (assert (string= "(" token))
+      (loop
+         :for (ty arg) := (multiple-value-list (token-next stream))
+         :while (stop-when-char arg ")")
+         :collect (prog1 (list ty arg)
+                    (token-skip stream #\,))))))

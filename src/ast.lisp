@@ -9,20 +9,18 @@
   "Build the javascript ast from a STRING."
   (ast-from-stream (string-to-stream string)))
 
-(defun ast-for (stream token)
+(defun ast-for (stream ty token)
   (cond
-    ((ast-function-p token) (ast-build-function stream))
-    ((ast-var-p token) (ast-build-var stream token))
-    ((ast-obj-p token) (ast-build-object stream))
-    ((ast-array-p token) (ast-build-array stream))
-    ((string= "return" (cadr token))
-     (progn
-       `(:ret ,(ast-from-stream stream))))
-    (t token)))
+    ((ast-function-p ty token) (ast-build-function stream))
+    ((ast-var-p ty token) (ast-build-var stream token))
+    ((ast-obj-p ty token) (ast-build-object stream))
+    ((ast-array-p ty token) (ast-build-array stream))
+    ((string= "return" token) `(:ret ,(ast-from-stream stream)))
+    (t `(,ty ,token))))
 
 (defun ast-from-stream (stream)
   "Build the javascript ast from a STREAM."
   (loop
-     :for token := (token-next stream)
+     :for (ty token) := (multiple-value-list (token-next stream))
      :while (stop-when-char token ";")
-     :collect (ast-for stream token)))
+     :collect (ast-for stream ty token)))
