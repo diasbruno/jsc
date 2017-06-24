@@ -14,4 +14,5 @@
                              (:file "object")
                              (:file "array")
                              (:file "var")
-                             (:file "function")))))
+                             (:file "function")
+                             (:file "import")))))

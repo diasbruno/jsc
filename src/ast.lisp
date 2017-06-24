@@ -15,6 +15,7 @@
     ((ast-var-p ty token) (ast-build-var stream token))
     ((ast-obj-p ty token) (ast-build-object stream))
     ((ast-array-p ty token) (ast-build-array stream))
+    ((string= "import" token) (ast-build-import stream))
     ((string= "return" token) `(:ret ,(ast-from-stream stream)))
     (t `(,ty ,token))))
 
