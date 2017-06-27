@@ -27,5 +27,6 @@
          :for (ty stmt) := (multiple-value-list (token-next stream))
          :while (stop-when-char stmt ";")
          :nconc (when (ast-var-name-p ty)
-                  (token-skip stream #\,)
-                  (list `(,(list ty stmt) ,(ast-assignment stream)))))))
+                  (progn
+                    (token-skip stream #\,)
+                    (list `(,(list ty stmt) ,(ast-assignment stream))))))))
