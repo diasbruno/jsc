@@ -5,5 +5,5 @@
   `(:arr ,(loop
              :for (ty token) := (multiple-value-list (token-next stream))
              :while (stop-when-char token "]")
-             :nconc (prog1 (list (ast-for stream ty token))
-                      (token-skip stream #\,)))))
+             :collect (prog1 (ast-for stream ty token)
+                        (token-skip stream #\,)))))
