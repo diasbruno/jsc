@@ -10,7 +10,7 @@
   :version "0.1.0"
   :author "Bruno Dias <dias.h.bruno@gmail.com>"
   :license "MIT"
-  :components ((:module "src/"
+  :components ((:module "src/ast/"
                 :serial t
                 :components ((:file "package")
                              (:file "token")
