@@ -35,8 +35,10 @@
 
 (test ast-import-mixed-glob-and-default
   (let ((tst (jsc:ast-from-string "import * as a, b from \"test\";")))
-    (is (equal tst `((:import ((:glob "a") (:ident "b")) (:str "test")))))))
+    (is (equal tst `((:import ((:glob "a")
+                               (:ident "b")) (:str "test")))))))
 
 (test ast-import-mixed-default-and-glob
   (let ((tst (jsc:ast-from-string "import  a, * as b from \"test\";")))
-    (is (equal tst `((:import ((:ident "a") (:glob "b")) (:str "test")))))))
+    (is (equal tst `((:import ((:ident "a")
+                               (:glob "b")) (:str "test")))))))

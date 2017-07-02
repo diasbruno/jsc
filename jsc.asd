@@ -21,6 +21,7 @@
                              (:file "vars")
                              (:file "function")
                              (:file "import")
+                             (:file "expressions")
                              (:file "ast")))
                (:module "src/codegen/"
                 :serial t

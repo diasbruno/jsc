@@ -20,7 +20,7 @@
   "Real build the object with STREAM."
   (loop
      :for (ty stmt) := (multiple-value-list (token-next stream))
-     :while (and stmt (stop-when-char stmt "}"))
+     :while (stop-when-char stmt "}")
      :collect (when (ast-object-key-p ty)
                 (list (list ty stmt)
                       (ast-process-key-value stream)))))

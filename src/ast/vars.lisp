@@ -11,7 +11,7 @@
         ((string= "let" token) :let)
         (t nil)))
 
-(defun ast-assignment (stream)
+(defun ast-assignment-var (stream)
   "Build the ast for the value of a variable from a STREAM."
   (token-next stream)
   (multiple-value-bind (ty token)
@@ -29,4 +29,4 @@
          :nconc (when (ast-var-name-p ty)
                   (progn
                     (token-skip stream #\,)
-                    (list `(,(list ty stmt) ,(ast-assignment stream))))))))
+                    (list `(,(list ty stmt) ,(ast-assignment-var stream))))))))

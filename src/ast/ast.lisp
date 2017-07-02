@@ -9,7 +9,7 @@
   "Build the javascript ast from a STRING."
   (ast-from-stream (string-to-stream string)))
 
-(defun ast-for (stream ty token)
+(defun ast-for (stream ty token &optional (allow-expr t))
   (cond
     ((ast-function-p ty token) (ast-build-function stream))
     ((ast-var-p ty token) (ast-build-var stream token))
@@ -17,7 +17,15 @@
     ((ast-array-p ty token) (ast-build-array stream))
     ((string= "import" token) (ast-build-import stream))
     ((string= "return" token) `(:ret ,(ast-from-stream stream)))
+    ((eq ty :ident) (if allow-expr
+                        (ast-build-expression stream ty token)
+                        `(,ty ,token)))
     (t `(,ty ,token))))
+
+(defun ast-next-item (stream)
+  (multiple-value-bind (ty token)
+      (token-next stream)
+    (ast-for stream ty token)))
 
 (defun ast-from-stream (stream)
   "Build the javascript ast from a STREAM."

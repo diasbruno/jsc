@@ -15,4 +15,5 @@
                              (:file "array")
                              (:file "var")
                              (:file "function")
-                             (:file "import")))))
+                             (:file "import")
+                             (:file "expressions")))))

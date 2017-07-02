@@ -6,6 +6,7 @@
            #:ast-build-object
            #:ast-build-array
            #:ast-build-var
+           #:ast-build-expression
            #:tokenizer
            #:token-next
            #:token-skip

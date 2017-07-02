@@ -19,7 +19,7 @@
 (declaim (inline punctuation-char-p))
 (defun punctuation-char-p (char)
   "Is CHAR is punctuation?"
-  (find char "=-|$%^@<>,;:+*&/\\"))
+  (find char "=-|$%^@<>.,;:+*&/\\"))
 
 (declaim (inline group-char-p))
 (defun group-char-p (char)
@@ -97,7 +97,7 @@
 
 (defun token-expect-char (stream char)
   (let ((c (peek-char nil stream nil)))
-    (if (char-equal c #\SPACE)
+    (if (and c (char-equal c #\SPACE))
         (progn
           (read-spaces stream)
           (token-expect-char stream char))
@@ -106,19 +106,17 @@
 (defun token-next (stream &optional (keep-space nil))
   "Parse from a STREAM."
   (let ((c (peek-char nil stream nil)))
-    (if c
-        (read-statement-by-char stream c keep-space)
-        nil)))
+    (when c
+      (read-statement-by-char stream c keep-space))))
 
 (defun token-ahead (stream &optional (keep-space nil))
   "Parse from a STREAM."
   (let ((c (peek-char nil stream nil)))
-    (if c
-        (read-statement-by-char stream c keep-space)
-        nil)))
+    (when 
+        (read-statement-by-char stream c keep-space))))
 
-(defun stop-when-char (token char)
-  (and token (not (string= char token))))
+(defun stop-when-char (token ch)
+  (and token (not (string= ch token))))
 
 (defun token-skip (stream char)
   (when (token-expect-char stream char)
