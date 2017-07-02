@@ -1,4 +1,4 @@
-(in-package :jsc)
+(in-package :jsc-ast)
 
 (defun ast-literals-p (ty token)
   "Check if TOKEN is literal."

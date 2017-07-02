@@ -1,4 +1,4 @@
-(defpackage #:jsc
+(defpackage #:jsc-ast
   (:use #:cl)
   (:export #:ast-from-file
            #:ast-from-string
@@ -11,4 +11,4 @@
            #:token-skip
            ))
 
-(in-package #:jsc)
+(in-package #:jsc-ast)

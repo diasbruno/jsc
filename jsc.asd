@@ -21,4 +21,11 @@
                              (:file "vars")
                              (:file "function")
                              (:file "import")
-                             (:file "ast")))))
+                             (:file "ast")))
+               (:module "src/codegen/"
+                :serial t
+                :components ((:file "package")
+                             (:file "codegen")))
+               (:module "src/"
+                :serial t
+                :components ((:file "package")))))

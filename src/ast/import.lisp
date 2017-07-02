@@ -1,4 +1,4 @@
-(in-package :jsc)
+(in-package :jsc-ast)
 
 (defun import-terminate (stmt)
   (or (string= stmt "from")

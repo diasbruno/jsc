@@ -1,4 +1,4 @@
-(in-package :jsc)
+(in-package :jsc-ast)
 
 (defun ast-build-function (stream)
   "Build the ast for a function with STREAM."

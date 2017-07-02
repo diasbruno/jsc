@@ -1,4 +1,4 @@
-(in-package :jsc)
+(in-package :jsc-ast)
 
 (defun ast-is-scoped-p (ch)
   (and ch (or (eq ch #\,) (eq ch #\}))))

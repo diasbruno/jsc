@@ -1,4 +1,4 @@
-(in-package :jsc)
+(in-package :jsc-ast)
 
 (defun string-to-stream (string)
   "Parse from a STRING."

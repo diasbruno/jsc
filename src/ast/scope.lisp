@@ -1,4 +1,4 @@
-(in-package :jsc)
+(in-package :jsc-ast)
 
 (defun close-body-p (ty token)
   (and (eq ty :grp) (string= "}" token)))

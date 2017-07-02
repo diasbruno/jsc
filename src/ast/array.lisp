@@ -1,4 +1,4 @@
-(in-package :jsc)
+(in-package :jsc-ast)
 
 (defun ast-build-array (stream)
   "Build the array ast with STREAM."

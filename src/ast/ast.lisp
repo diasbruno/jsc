@@ -1,4 +1,4 @@
-(in-package :jsc)
+(in-package :jsc-ast)
 
 (defun ast-from-file (file)
   "Build the javascript ast from a FILE."

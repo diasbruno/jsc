@@ -1,4 +1,4 @@
-(in-package :jsc)
+(in-package :jsc-ast)
 
 (defun ast-var-name-p (ty)
   "Check if the TOKEN has a valid key type."
