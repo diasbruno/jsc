@@ -42,15 +42,19 @@
                 :while (should-break-expr c)
                 :collect (collect-connector-expr stream c))))
 
+(defvar -jsc-op-table
+  '(("=" . :assignment)
+    ("+" . :addition)))
+
 (defun ast-build-expression (stream ty token)
   (let ((proxy (list ty (string token))))
     (progn
       (read-spaces stream)
-      (let ((lhs `(:expr ,(cons proxy (ast-expression stream)))))
-        (let ((c (peek-char nil stream nil)))
-          (read-spaces stream)
-          (if (and c (char-equal c #\=))
-              (progn
-                (token-next stream)
-                `(:assignment ,lhs ,(ast-from-stream stream)))
-              lhs))))))
+      (let* ((lhs `(:expr ,(cons proxy (ast-expression stream))))
+             (c (peek-char nil stream nil))
+             (op (assoc (string c) -jsc-op-table :test #'string=)))
+        (if op
+            (progn
+              (print (multiple-value-list (token-next stream)))
+              `(,(cdr op) ,lhs ,(ast-from-stream stream)))
+            lhs)))))

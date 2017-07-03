@@ -11,10 +11,9 @@ function '( exps ')' {body}
   (read-spaces stream)
   (assert (char-equal (peek-char nil stream nil) #\{))
   (token-skip stream #\{)
-  (loop
-     :for (ty expr) := (multiple-value-list (token-next stream))
-     :while (stop-when-char expr "}")
-     :collect (ast-for stream ty expr)))
+  (prog1 (ast-from-stream stream "}")
+    (print (format nil "after body ~a" (peek-char nil stream nil)))
+    (token-skip stream #\})))
 
 (defun ast-parentesis-expr (stream)
   "Build ast for expressions inside parentesis.

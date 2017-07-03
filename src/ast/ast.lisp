@@ -27,9 +27,11 @@
       (token-next stream)
     (ast-for stream ty token)))
 
-(defun ast-from-stream (stream)
+(defun ast-from-stream (stream &optional (terminate ";"))
   "Build the javascript ast from a STREAM."
   (loop
      :for (ty token) := (multiple-value-list (token-next stream))
-     :while (stop-when-char token ";")
-     :collect (ast-for stream ty token)))
+     :while (stop-when-char token terminate)
+     :collect (progn
+                (print (format nil "ast for ~a" token))
+                (ast-for stream ty token))))
