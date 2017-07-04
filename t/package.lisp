@@ -1,5 +1,5 @@
 (in-package :cl-user)
-(defpackage jsc-tests
+(defpackage #:jsc-tests
   (:use #:cl #:fiveam)
   (:export :run-all))
 (in-package :jsc-tests)
