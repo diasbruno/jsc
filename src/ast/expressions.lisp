@@ -38,19 +38,37 @@
        state
        (remove-if #'null
                   (loop
-                     :for c := (peek-char nil st nil)
+                     :for c := (chear-ahead st)
                      :while (should-break-expr c)
-                     :collect (progn
-                                (print c)
-                                (collect-connector-expr state c))))))))
+                     :collect (collect-connector-expr state c)))))))
 
 (defvar -jsc-op-table
   '(("=" . :assignment)
     ("+" . :addition)))
 
+(defun find-operation (token)
+  (assoc token -jsc-op-table :test #'string=))
+
+(defun ast-binary-op (state op)
+  (ast-set-item state (list (cdr op)
+                            (ast-state-item state)))
+  (let ((leaf (ast-from-stream
+               (jsc-ast:ast-new (ast-state-stream state) nil nil))))
+    (ast-join-item state leaf)))
+
 (defun ast-build-expression (state ty token)
   (let* ((proxy (list ty (string token)))
-        (st (ast-state-stream state)))
-    (prog1 state
+         (st (ast-state-stream state)))
+    (progn
       (read-spaces st)
-      (ast-set-item state (list :expr proxy (ast-expression state))))))
+      (ast-join-tree state)
+      (ast-set-item state proxy)
+      (when (not (end-of-stream st))
+        (let* ((op-token (multiple-value-list (token-next st)))
+               (op (find-operation (cadr op-token))))
+          (prog1 state
+            (when op
+              (ast-binary-op state op))))))))
+
+
+

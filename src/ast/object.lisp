@@ -8,7 +8,7 @@
   (read-spaces stream)
   (token-skip stream #\:)
   (read-spaces stream)
-  (let ((ch (peek-char nil stream nil)))
+  (let ((ch (char-ahead stream)))
     (cond
       ((ast-is-scoped-p ch) (prog1 :scoped-var
                               (token-skip stream #\,)))

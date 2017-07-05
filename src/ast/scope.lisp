@@ -9,10 +9,10 @@ function '( exps ')' {body}
 '( exps ')' => {body}
 "
   (read-spaces stream)
-  (assert (char-equal (peek-char nil stream nil) #\{))
+  (assert (char-equal (char-ahead stream) #\{))
   (token-skip stream #\{)
   (prog1 (ast-from-stream stream "}")
-    (print (format nil "after body ~a" (peek-char nil stream nil)))
+    (print (format nil "after body ~a" (char-ahead stream)))
     (token-skip stream #\})))
 
 (defun ast-parentesis-expr (stream)
@@ -28,12 +28,12 @@ fn.call '(' exps ')'
 new T '(' exps ')'
 "
   (read-spaces stream)
-  (assert (char-equal (peek-char nil stream nil) #\())
+  (assert (char-equal (char-ahead stream) #\())
   (token-skip stream #\()
   (loop
      :for (ty arg) := (multiple-value-list (token-next stream))
      :while (stop-when-char arg ")")
-     :collect (let ((ch (peek-char nil stream nil)))
+     :collect (let ((ch (char-ahead stream)))
                 (progn
                   (when (and ch (char-equal ch #\,))
                     (token-skip stream #\,))

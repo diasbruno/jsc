@@ -6,11 +6,30 @@
   `(make-ast-state :stream ,a :tree ,b :item ,c))
 
 (defun ast-join-item (a b)
-  (let* ((st (ast-stream a))
-         (tr (ast-tree a))
-         (ia (ast-item a))
-         (ib (ast-item b)))
-    (ast-new st tr (cons ia ib))))
+  (let* ((st (ast-state-stream a))
+         (tr (ast-state-tree a))
+         (ia (ast-state-item a))
+         (ib (ast-state-item b)))
+    (ast-new st tr (nconc ia `(,ib)))))
+
+(defun ast-join-tree (st)
+  (if (null (ast-state-tree st))
+      (setf (ast-state-tree st)
+            (ast-state-item st))
+      (setf (ast-state-tree st)
+            (nconc (ast-state-tree st)
+                   (ast-state-item st))))
+  st)
+
+(defun ast-commit-tree (st)
+  (setf (ast-state-tree st) (ast-state-item st))
+  (setf (ast-state-item st) nil)
+  st)
+
+(defun ast-set-tree (st b)
+  (setf (ast-state-tree st) b)
+  (setf (ast-state-item st) nil)
+  st)
 
 (defun ast-set-item (st b)
   (setf (ast-state-item st) b)
@@ -34,9 +53,10 @@
     ((ast-array-p ty token) (ast-build-array state))
     ((string= "import" token) (ast-build-import state))
     ((string= "return" token) `(:ret ,(ast-from-stream state)))
-    ((eq ty :ident) (if allow-expr
-                        (ast-build-expression state ty token)
-                        `(,ty ,token)))
+    ((or (eq ty :num)
+         (eq ty :ident)) (if allow-expr
+                             (ast-build-expression state ty token)
+                             `(,ty ,token)))
     (t `(,ty ,token)))
   state)
 
@@ -47,10 +67,10 @@
 
 (defun ast-from-stream (state &optional (terminate ";"))
   "Build the javascript ast from a STREAM."
-  (loop
-     :for (ty token) := (multiple-value-list (token-next (ast-state-stream state)))
-     :while (and (not (eq token :eof)) (stop-when-char token terminate))
-     :collect (progn
-                (print (format nil "ast for ~a" token))
-                (ast-for state ty token))))
-
+  (let ((st (ast-state-stream state)))
+    (progn
+      (loop
+         :for (ty token) := (multiple-value-list (token-next st))
+         :while (and token (not (string= terminate token)))
+         :do (ast-for state ty token))
+      (ast-join-tree state))))

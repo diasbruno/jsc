@@ -1,13 +1,13 @@
 (in-package :jsc-ast)
 
-(defun end-of-stream (c)
-  (and c (eq c :eof)))
-
-(defun cont-stream (c)
-  (not (end-of-stream c)))
+(defun end-of-stream (stream)
+  (eq (char-ahead stream) :eof))
 
 (defun char-ahead (stream)
   (peek-char nil stream nil :eof))
+
+(defun char-read (stream)
+  (read-char stream nil :eof))
 
 (defun string-to-stream (string)
   "Parse from a STRING."
@@ -44,60 +44,63 @@
   "Read from STREAM a given TYPE until PRED terminates the reading."
 
   (let ((v (loop
-              :for ch := (peek-char nil stream nil)
+              :for ch := (char-ahead stream)
               :while (and ch (funcall pred ch))
-              :collect (read-char stream nil nil))))
+              :collect (char-read stream))))
     (values type (concatenate 'string v))))
 
 (defun read-string-until (stream char)
   "Read a string from STREAM until find CHAR to terminate."
-  (read-char stream nil nil)
+  (char-read stream)
   (multiple-value-bind (ty token)
       (read-until stream
                   :str
-                  #'(lambda (ch) (and (cont-stream ch)
+                  #'(lambda (ch) (and (not (end-of-stream stream))
                                       (not (char-equal ch char)))))
-    (progn
-      (read-char stream nil nil)
-      (values ty token))))
+    (prog1 (values ty token)
+      (char-read stream))))
 
 (defun read-punct (stream)
   "Read punctuation from a STREAM."
   (read-until stream
               :punct
-              #'(lambda (ch) (and (cont-stream ch)
+              #'(lambda (ch) (and (not (end-of-stream stream))
                                   (punctuation-char-p ch)))))
 
 (defun read-spaces (stream)
   "Read spaces from STREAM."
   (read-until stream
               :spc
-              #'(lambda (ch) (and (cont-stream ch)
+              #'(lambda (ch) (and (not (end-of-stream stream))
                                   (char-equal ch #\space)))))
 
 (defun read-identifier (stream)
   "Read identifier from STREAM."
   (read-until stream
               :ident
-              #'(lambda (ch) (and (cont-stream ch)
+              #'(lambda (ch) (and (not (end-of-stream stream))
                                   (or (identifier-char-p ch)
                                       (find ch "_"))))))
 
 (defun read-number (stream)
   (read-until stream
               :num
-              #'(lambda (ch) (and (cont-stream ch)
+              #'(lambda (ch) (and (not (end-of-stream stream))
                                   (numeric-char-p ch)))))
+
+(defun read-group (stream)
+  (values :grp (string (char-read stream))))
 
 (defun read-statement-by-char (stream char keep-space)
   "Read a statement from a STREAM by a CHAR."
   (cond
+    ((end-of-stream stream) :eof)
     ((char-equal char #\newline)
      (progn
-       (read-char stream nil nil)
+       (char-read stream)
        (token-next stream)))
     ((string-quote-p char) (read-string-until stream char))
-    ((group-char-p char) (values :grp (string (read-char stream nil nil))))
+    ((group-char-p char) (read-group stream))
     ((punctuation-char-p char) (read-punct stream))
     ((char-equal char #\space)
      (if keep-space
@@ -111,32 +114,27 @@
 
 (defun token-expect-char (stream char)
   (let ((c (char-ahead stream)))
-    (cond
-      ((and c (char-equal c #\SPACE))
-       (progn
-         (read-spaces stream)
-         (token-expect-char stream char)))
-      ((end-of-strem c) :eof)
-      (t (and c (char-equal c char))))))
+    (when (not (end-of-stream stream))
+      (cond
+        ((and c (char-equal c #\SPACE))
+         (progn
+           (read-spaces stream)
+           (token-expect-char stream char)))
+        (t (and c (char-equal c char)))))))
 
 (defun token-next (stream &optional (keep-space nil))
   "Parse from a STREAM."
   (let ((c (char-ahead stream)))
-    (progn
-      (if (cont-stream c)
-         (read-statement-by-char stream c keep-space)
-         :eof))))
+    (read-statement-by-char stream c keep-space)))
 
 (defun token-ahead (stream &optional (keep-space nil))
   "Parse from a STREAM."
   (let ((c (char-ahead stream)))
-    (if (not (end-of-stream c))
-        (read-statement-by-char stream c keep-space)
-        :eof)))
+    (when (not (end-of-stream stream))
+      (read-statement-by-char stream c keep-space))))
 
 (defun stop-when-char (token ch)
-  (print (format nil "stop when ~a ~a" ch token))
-  (and ch token (not (string= ch token))))
+  (and token (not (string= ch token))))
 
 (defun token-skip (stream char)
   (when (token-expect-char stream char)

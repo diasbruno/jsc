@@ -3,7 +3,7 @@
 (defun ast-build-function (stream)
   "Build the ast for a function with STREAM."
   (read-spaces stream)
-  `(:fn ,(if (eq (peek-char nil stream nil) #\()
+  `(:fn ,(if (eq (char-ahead stream) #\()
              nil
              (multiple-value-bind (ty maybe-name)
                  (token-next stream)
