@@ -9,13 +9,14 @@
   :components ((:module "t"
                 :serial t
                 :components ((:file "package")
+                             (:file "types")
                              ;(:file "string")
                              ;(:file "number")
                              ;(:file "object")
                              ;(:file "array")
                              ;(:file "var")
-                             (:file "function")
+                             ;(:file "function")
                              ;(:file "import")
                              ;(:file "scopes")
-                             (:file "expressions")
+                             ;(:file "expressions")
                              ))))
