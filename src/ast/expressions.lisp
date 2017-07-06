@@ -49,8 +49,8 @@
   (assoc token -jsc-op-table :test #'string=))
 
 (defun ast-binary-op (state)
-  (let ((leaf (ast-from-stream
-               (ast-new (ast-state-stream state) nil))))
+  (let ((leaf (ast-next-item (ast-new (ast-state-stream state) nil))))
+    (print (format nil "leaf ~a" leaf))
     (ast-join-trees state leaf)))
 
 (defun ast-build-expression (state ty token)
@@ -60,11 +60,13 @@
       (read-spaces st)
       (setf (ast-state-tree state) proxy)
       (when (not (end-of-stream st))
-        (let* ((op-token (multiple-value-list (token-next st)))
-               (op (find-operation (cadr op-token))))
-          (if (string= (cadr op-token) ";")
-              state
+        (read-spaces st)
+        (if (string= (string (char-ahead st)) ";")
+            state
+            (let* ((op-token (multiple-value-list (token-next st)))
+                   (op (find-operation (cadr op-token))))
               (prog1 state
+                (print op-token)
                 (when op
                   (setf (ast-state-tree state)
                         (list (cdr op)

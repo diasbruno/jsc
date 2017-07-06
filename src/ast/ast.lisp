@@ -38,12 +38,11 @@
       (token-next (ast-state-stream state))
     (ast-for state ty token)))
 
-(defun ast-from-stream (state &optional (terminate ";"))
+(defun ast-from-stream (state &optional (terminate :eof))
   "Build the javascript ast from a STREAM."
   (let ((st (ast-state-stream state)))
-    (progn 
-      (loop
-         :for (ty token) := (multiple-value-list (token-next st))
-         :while (and token (not (string= terminate token)))
-         :do (ast-for state ty token))
-      state)))
+    (loop
+       :for (ty token) := (multiple-value-list (token-next st))
+       :while (and token (not (string= terminate token)))
+       :nconc (unless (string= token ";")
+                (list (ast-for (ast-new st nil) ty token))))))
