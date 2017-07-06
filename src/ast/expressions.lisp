@@ -34,13 +34,12 @@
   (let ((st (ast-state-stream state)))
     (prog1 state
       (print state)
-      (ast-set-item
-       state
-       (remove-if #'null
-                  (loop
-                     :for c := (chear-ahead st)
-                     :while (should-break-expr c)
-                     :collect (collect-connector-expr state c)))))))
+      (setf (ast-state-tree state)
+            (remove-if #'null
+                       (loop
+                          :for c := (chear-ahead st)
+                          :while (should-break-expr c)
+                          :collect (collect-connector-expr state c)))))))
 
 (defvar -jsc-op-table
   '(("=" . :assignment)
@@ -49,26 +48,25 @@
 (defun find-operation (token)
   (assoc token -jsc-op-table :test #'string=))
 
-(defun ast-binary-op (state op)
-  (ast-set-item state (list (cdr op)
-                            (ast-state-item state)))
+(defun ast-binary-op (state)
   (let ((leaf (ast-from-stream
-               (jsc-ast:ast-new (ast-state-stream state) nil nil))))
-    (ast-join-item state leaf)))
+               (ast-new (ast-state-stream state) nil))))
+    (ast-join-trees state leaf)))
 
 (defun ast-build-expression (state ty token)
-  (let* ((proxy (list ty (string token)))
+  (let* ((proxy (list ty token))
          (st (ast-state-stream state)))
     (progn
       (read-spaces st)
-      (ast-join-tree state)
-      (ast-set-item state proxy)
+      (setf (ast-state-tree state) proxy)
       (when (not (end-of-stream st))
         (let* ((op-token (multiple-value-list (token-next st)))
                (op (find-operation (cadr op-token))))
-          (prog1 state
-            (when op
-              (ast-binary-op state op))))))))
-
-
-
+          (if (string= (cadr op-token) ";")
+              state
+              (prog1 state
+                (when op
+                  (setf (ast-state-tree state)
+                        (list (cdr op)
+                              (ast-state-tree state)))
+                  (ast-binary-op state)))))))))

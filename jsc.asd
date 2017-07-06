@@ -13,6 +13,7 @@
   :components ((:module "src/ast/"
                 :serial t
                 :components ((:file "package")
+                             (:file "types")
                              (:file "token")
                              (:file "checkers")
                              (:file "object")
