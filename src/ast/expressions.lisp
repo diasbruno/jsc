@@ -21,11 +21,14 @@
            (in (ast-state-tree (ast-next-item tmp))))
       (setf (ast-state-tree state)
             (list (ast-state-tree state)
-                  `(:aaccessor ,in)))
-      (print (char-ahead st)))))
+                  `(:aaccessor ,in))))))
 
 (defun ast-function-call (state)
-  `(:func-call ,(ast-parentesis-expr state)))
+  (let* ((st (ast-state-stream state))
+         (tmp (ast-new st nil))
+         (s (ast-parentesis-expr tmp)))
+    (print s)
+    (list :func-call s)))
 
 ;; State -> Char -> State
 (defun collect-connector-expr (state c)

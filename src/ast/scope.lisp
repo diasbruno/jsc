@@ -15,7 +15,7 @@ function '( exps ')' {body}
     (print (format nil "after body ~a" (char-ahead stream)))
     (token-skip stream #\})))
 
-(defun ast-parentesis-expr (stream)
+(defun ast-parentesis-expr (state)
   "Build ast for expressions inside parentesis.
 
 '(' exps ')'
@@ -27,14 +27,15 @@ function '( exps ')' {body}
 fn.call '(' exps ')'
 new T '(' exps ')'
 "
-  (read-spaces stream)
-  (assert (char-equal (char-ahead stream) #\())
-  (token-skip stream #\()
-  (loop
-     :for (ty arg) := (multiple-value-list (token-next stream))
-     :while (stop-when-char arg ")")
-     :collect (let ((ch (char-ahead stream)))
-                (progn
-                  (when (and ch (char-equal ch #\,))
-                    (token-skip stream #\,))
-                  (list ty arg)))))
+  (let ((st (ast-state-stream state)))
+    (read-spaces st)
+    (assert (char-equal (char-ahead st) #\())
+    (token-skip st #\()
+    (loop
+       :for (ty arg) := (multiple-value-list (token-next st))
+       :while (stop-when-char arg ")")
+       :collect (let ((ch (char-ahead st)))
+                  (progn
+                    (when (and ch (char-equal ch #\,))
+                      (token-skip st #\,))
+                    (list ty arg))))))
