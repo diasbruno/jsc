@@ -12,7 +12,7 @@
                              (:file "types")
                              (:file "string")
                              (:file "number")
-                             ;;(:file "scopes")
+                             (:file "scopes")
                              ;;(:file "object")
                              ;;(:file "array")
                              ;;(:file "var")
