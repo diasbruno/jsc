@@ -4,9 +4,9 @@
            #:ast-from-string
            #:ast-from-stream
            #:ast-new
+           #:ast-state-stream
+           #:ast-state-tree
            #:ast-join-trees
-           #:ast-set-tree
-           #:ast-set-item
            #:ast-build-function
            #:ast-build-object
            #:ast-build-array

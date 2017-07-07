@@ -2,6 +2,8 @@
   (:use #:cl #:jsc-ast #:jsc-codegen)
   (:export jsc-ast:ast-new
            jsc-ast:ast-join-trees
+           jsc-ast:ast-state-stream
+           jsc-ast:ast-state-tree
            jsc-ast:ast-from-file
            jsc-ast:ast-from-string
            jsc-ast:ast-from-stream

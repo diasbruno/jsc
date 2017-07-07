@@ -57,8 +57,9 @@
                   :str
                   #'(lambda (ch) (and (not (end-of-stream stream))
                                       (not (char-equal ch char)))))
-    (prog1 (values ty token)
-      (char-read stream))))
+    (progn
+      (char-read stream)
+      (values ty token))))
 
 (defun read-punct (stream)
   "Read punctuation from a STREAM."

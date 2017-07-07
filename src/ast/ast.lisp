@@ -2,16 +2,16 @@
 
 (defun ast-from-file (file)
   "Build the javascript ast from a FILE."
-  (with-open-file (stream file)
-    (ast-from-stream (ast-new stream nil))))
+  (with-open-file (st file)
+    (ast-from-stream (ast-new st nil))))
 
 (defun ast-from-string (string)
   "Build the javascript ast from a STRING."
   (let ((st (make-string-input-stream string)))
-    (ast-from-stream (ast-new stream nil))))
+    (ast-from-stream (ast-new st nil))))
 
 (defun ast-literal-p (ty)
-  (or (eq ty :num) (eq ty :ident)))
+  (or (eq ty :str) (eq ty :num) (eq ty :ident)))
 
 (defun ast-import-p (token)
   (string= "import" token))

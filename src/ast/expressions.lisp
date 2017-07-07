@@ -27,7 +27,6 @@
   (let* ((st (ast-state-stream state))
          (tmp (ast-new st nil))
          (s (ast-parentesis-expr tmp)))
-    (print s)
     (list :func-call s)))
 
 ;; State -> Char -> State
