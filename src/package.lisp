@@ -1,8 +1,7 @@
 (defpackage #:jsc
   (:use #:cl #:jsc-ast #:jsc-codegen)
   (:export jsc-ast:ast-new
-           jsc-ast:ast-join-item
-           jsc-ast:ast-push-to-tree
+           jsc-ast:ast-join-trees
            jsc-ast:ast-from-file
            jsc-ast:ast-from-string
            jsc-ast:ast-from-stream

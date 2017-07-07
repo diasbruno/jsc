@@ -65,7 +65,6 @@
     (progn
       (read-spaces st)
       (setf (ast-state-tree state) proxy)
-      (print (ast-expression state))
       (when (not (end-of-stream st))
         (read-spaces st)
         (if (and (string= (string (char-ahead st)) ";"))
