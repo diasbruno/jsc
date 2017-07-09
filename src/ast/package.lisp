@@ -12,8 +12,8 @@
            #:ast-build-array
            #:ast-build-var
            #:ast-build-expression
-           #:ast-body
-           #:ast-parentesis-expr
+           #:ast-curly-scope
+           #:ast-parentesis-scope
            #:tokenizer
            #:token-next
            #:token-skip

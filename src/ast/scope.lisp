@@ -1,6 +1,6 @@
 (in-package :jsc-ast)
 
-(defun ast-body (state)
+(defun ast-curly-scope (state)
   "Build the body { N..exps; } with a STREAM.
 
 if '( exps ')' {body} else if '(' exps ')' {body} else {body}
@@ -13,12 +13,13 @@ function '( exps ')' {body}
     (assert (char-equal (char-ahead st) #\{))
     (token-skip st #\{)
     (let ((s (ast-from-stream state "}")))
-      (print s)
-      (prog1 (ast-new (ast-state-stream state)
-                      (nconc (list :curly-scope) (ast-state-tree s)))
-        (token-skip st #\})))))
+      (progn
+        (token-skip st #\})
+        (ast-new st
+                 (nconc (list :curly-scope)
+                        (mapcar #'ast-state-tree s)))))))
 
-(defun ast-parentesis-expr (state)
+(defun ast-parentesis-scope (state)
   "Build ast for expressions inside parentesis.
 
 '(' exps ')'
@@ -34,12 +35,14 @@ new T '(' exps ')'
     (read-spaces st)
     (assert (char-equal (char-ahead st) #\())
     (token-skip st #\()
-    (loop
-       :for (ty arg) := (multiple-value-list (token-next st))
-       :while (stop-when-char arg ")")
-       :collect (let ((ch (char-ahead st)))
-                  (progn
-                    (print ch)
-                    (when (and ch (char-equal ch #\,))
-                      (token-skip st #\,))
-                    (list ty arg))))))
+    (let ((s (loop
+                :for expr := (ast-next-item (ast-new st nil))
+                :while (and (not (eq (char-ahead st) :eof)))
+                :collect (let ((ch (char-ahead st)))
+                           (progn
+                             (when (and (not (eq :eof ch))
+                                        (char-equal ch #\,))
+                               (token-skip st #\,))
+                             expr)))))
+      (ast-new st (nconc (list :parentesis-scope)
+                         (mapcar #'ast-state-tree s))))))

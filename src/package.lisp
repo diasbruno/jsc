@@ -11,8 +11,8 @@
            jsc-ast:ast-build-object
            jsc-ast:ast-build-array
            jsc-ast:ast-build-var
-           jsc-ast:ast-body
-           jsc-ast:ast-parentesis-expr
+           jsc-ast:ast-curly-scope
+           jsc-ast:ast-parentesis-scope
            jsc-ast:tokenizer
            jsc-ast:token-next
            jsc-ast:token-skip

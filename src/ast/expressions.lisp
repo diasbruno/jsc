@@ -17,11 +17,10 @@
   (let ((st (ast-state-stream state)))
     (assert (char-equal (char-ahead st) #\[))
     (token-skip st #\[)
-    (let* ((tmp (ast-new st nil))
-           (in (ast-state-tree (ast-next-item tmp))))
-      (setf (ast-state-tree state)
-            (list (ast-state-tree state)
-                  `(:aaccessor ,in))))))
+    (let ((in (ast-state-tree (ast-next-item (ast-new st nil)))))
+      (ast-new st
+               (nconc (list (ast-state-tree state)
+                            `(:aaccessor ,in)))))))
 
 (defun ast-function-call (state)
   (let* ((st (ast-state-stream state))
@@ -40,12 +39,13 @@
 
 ;; State -> State
 (defun ast-expression (state)
-  (let ((st (ast-state-stream state)))
-    (prog1 state
-      (loop
-         :for c := (char-ahead st)
-         :while (and (not (eq c :eof)) (should-break-expr c))
-         :do (collect-connector-expr state c)))))
+  (let* ((st (ast-state-stream state))
+         (entire-expr (loop
+                         :for c := (char-ahead st)
+                         :while (and (not (eq c :eof)) (should-break-expr c))
+                         :collect (collect-connector-expr state c))))
+    (print (format nil "collected ~a" (car entire-expr)))
+    (car entire-expr)))
 
 (defvar -jsc-op-table
   '(("=" . :assignment)
@@ -56,24 +56,27 @@
 
 (defun ast-binary-op (state)
   (let ((leaf (ast-next-item (ast-new (ast-state-stream state) nil))))
+    (print leaf)
     (ast-join-trees state leaf)))
 
 (defun ast-build-expression (state ty token)
-  (let* ((proxy (list ty token))
-         (st (ast-state-stream state)))
+  (let ((st (ast-state-stream state)))
     (progn
       (read-spaces st)
-      (setf (ast-state-tree state) proxy)
-      (when (not (end-of-stream st))
-        (read-spaces st)
-        (if (and (string= (string (char-ahead st)) ";"))
-            state
-            (let* ((op-token (multiple-value-list (token-next st)))
-                   (op (find-operation (cadr op-token))))
-              (prog1 state
-
-                (when op
-                  (setf (ast-state-tree state)
-                        (list (cdr op)
-                              (ast-state-tree state)))
-                  (ast-binary-op state)))))))))
+      (setf (ast-state-tree state) (list ty token))
+      (let ((lhs (ast-expression state)))
+        (when (not (end-of-stream st))
+          (read-spaces st)
+          (let ((ch (char-ahead st)))
+            (progn
+              (print (format nil "lhs ~a next char ~a" lhs ch))
+              (if (find ch ";,)}]")
+                 lhs
+                 (let* ((op-token (multiple-value-list (token-next st)))
+                        (op (find-operation (cadr op-token))))
+                   (prog1 lhs
+                     (when op
+                       (setf (ast-state-tree lhs)
+                             (list (cdr op)
+                                   (ast-state-tree lhs)))
+                       (ast-binary-op lhs))))))))))))

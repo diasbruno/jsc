@@ -13,11 +13,10 @@
                              (:file "string")
                              (:file "number")
                              (:file "scopes")
+                             (:file "expressions")
                              ;;(:file "object")
                              ;;(:file "array")
                              ;;(:file "var")
                              ;;(:file "function")
                              ;;(:file "import")
-
-                             ;;(:file "expressions")
                              ))))
